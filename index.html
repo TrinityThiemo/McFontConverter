@@ -1,47 +1,101 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-  <title>Minecraft Font Converter</title>
+  <title>Font Converter</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
-    #input-text {
-      width: 400px;
-      height: 100px;
-      font-size: 18px;
+    body {
+      background: linear-gradient(45deg, #ffba66, #cf7f2b);
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
     }
-    
+
+    .container {
+      margin-top: 50px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #input-text,
     #converted-text {
       width: 400px;
       height: 100px;
       font-size: 18px;
-      font-family: "Arial", sans-serif;
     }
+
+    #converted-text {
+      cursor: pointer;
+    }
+	
+	.btn-static {
+      background-color: white;
+      border: 1px solid lightgrey;
+      cursor: default;
+	}
+	
+	.btn-static:active {
+      -moz-box-shadow:    inset 0 0 0px white;
+      -webkit-box-shadow: inset 0 0 0px white;
+      box-shadow:         inset 0 0 0px white;
+	}
   </style>
 </head>
 <body>
-  <h1>Minecraft Font Converter</h1>
-  <label for="input-text">Input Text:</label>
-  <textarea id="input-text" placeholder="Enter your text here"></textarea>
-  <button onclick="convertText()">Convert</button>
-  <br>
-  <label for="converted-text">Converted Text:</label>
-  <textarea id="converted-text" readonly></textarea>
+  <div class="container">
+    <div class="row" style="margin-bottom: 1em"><img width="89%" src="https://i.imgur.com/mWk9yXf.png"></div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
+          <label for="input-text" class="text-white">Input Text:</label>
+          <textarea id="input-text" class="form-control" placeholder="Enter your text here"></textarea>
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <label for="converted-text" class="text-white">Converted Text:</label>
+          <textarea id="converted-text" class="form-control" readonly></textarea>
+		    <h4 class="text-white" style="visibility: hidden" id="copy-message"></h4>
+        </div>
+      </div>
+    </div>
+	</div>
+  </div>
 
-  <script>
-    function convertText() {
-      const inputText = document.getElementById("input-text").value;
-      const convertedText = convertToFont(inputText);
-      document.getElementById("converted-text").value = convertedText;
-    }
+   <script>
+    const inputText = document.getElementById("input-text");
+    const convertedText = document.getElementById("converted-text");
+    const copyMessage = document.getElementById("copy-message");
+
+    inputText.addEventListener("input", function() {
+      const input = inputText.value;
+      const converted = convertToFont(input);
+      convertedText.value = converted;
+    });
+
+    convertedText.addEventListener("click", function() {
+      convertedText.select();
+      document.execCommand("copy");
+      copyMessage.innerText = "Copied to clipboard";
+      copyMessage.style.visibility='visible'
+      setTimeout(function() {
+        copyMessage.innerText = "";
+        copyMessage.style.visibility='hidden'
+      }, 5000);
+    });
 
     function convertToFont(text) {
       const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-      const f = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+      const font = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
       let convertedText = "";
 
       for (let i = 0; i < text.length; i++) {
         const index = alphabet.indexOf(text[i]);
         if (index !== -1) {
-          convertedText += f[index];
+          convertedText += font[index];
         } else {
           convertedText += text[i];
         }
