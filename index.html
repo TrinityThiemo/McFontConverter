@@ -1,108 +1,160 @@
-<!DOCTYPE html>
 <html>
 <head>
-  <title>Font Converter</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <style>
-    body {
-      background: linear-gradient(45deg, #ffba66, #cf7f2b);
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      background-size: cover;
-    }
-
-    .container {
-      margin-top: 50px;
-    }
-
-    .row {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    #input-text,
-    #converted-text {
-      width: 400px;
-      height: 100px;
-      font-size: 18px;
-    }
-
-    #converted-text {
-      cursor: pointer;
-    }
-	
-	.btn-static {
-      background-color: white;
-      border: 1px solid lightgrey;
-      cursor: default;
-	}
-	
-	.btn-static:active {
-      -moz-box-shadow:    inset 0 0 0px white;
-      -webkit-box-shadow: inset 0 0 0px white;
-      box-shadow:         inset 0 0 0px white;
-	}
-  </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="shortcut icon" href="assets/images/craftigames.jpg" type="image/x-icon">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/js/js.cookie.js"></script>
+    <title>RGB Creator & Font Converter</title>
 </head>
-<body>
-  <div class="container">
-    <div class="row" style="margin-bottom: 1em"><img width="89%" src="https://i.imgur.com/mWk9yXf.png"></div>
+
+<body id="bg" class="container" style="font-family: Quicksand;">
+
+<div id="hexColorTemplate" style="display:none;">
     <div class="row">
-      <div class="col">
-        <div class="form-group">
-          <label for="input-text" class="text-white">Input Text:</label>
-          <textarea id="input-text" class="form-control" placeholder="Enter your text here"></textarea>
-        </div>
-      </div>
-      <div class="col">
-        <div class="form-group">
-          <label for="converted-text" class="text-white">Converted Text:</label>
-          <textarea id="converted-text" class="form-control" readonly></textarea>
-		    <h4 class="text-white" style="visibility: hidden" id="copy-message"></h4>
-        </div>
-      </div>
+        <label for="color-$NUM">Hex Color #$NUM</label>
+        <input class="form-control col-md-1 hexColor" id="color-$NUM" style="border-radius: 10px;" value="$VAL"
+               data-jscolor="{preset:'small dark', position:'right'}" oninput="javascript: updateOutputText(event)"
+               onchange="javascript: updateOutputText(event); Cookies.set(`#${$NUM}`, document.getElementById('color-$NUM').value, { expires: 7, path: '' })"/>
     </div>
-	</div>
-  </div>
+</div>
 
-   <script>
-    const inputText = document.getElementById("input-text");
-    const convertedText = document.getElementById("converted-text");
-    const copyMessage = document.getElementById("copy-message");
+<div id="content">
+    <h1 id="title">RGB Creator & Font Converter</h1>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2" style="padding-left: 0;">
+                <div id="hexColors" class="container-fluid">
+                    <!-- Will be populated in JavaScript -->
+                </div>
+            </div>
+            <div class="col-md-10" style="padding-right: 0;">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div id="output">
+                            <label id="label4" for="outputText">Output</label>
+                            <label id="graylabel2" class="gray" for="outputText" style="font-weight: normal;">Copy-paste
+                                this for RGB text!</label>
+                            <pre id="outputText"
+                                 style="border-radius: 10px; white-space: pre-wrap; height: 70px; margin-right: 15px; font-family: MinecraftRegular; margin-bottom: 5px;"
+                                 onclick="copyTextToClipboard(this.textContent);"></pre>
+                            <p id="error">This is more than 256 characters and may not fit in the chat box.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="coloredNick" class="minecraft"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3" style="padding-left: 0;">
+                            <label for="nickname">Text</label>
+                            <input class="form-control" id="nickname" type="text" maxlength="100"
+                                   placeholder="Your Text"
+                                   value="Wow so fancy" oninput="javascript: updateOutputText(event);"
+                                   onchange="javascript: updateOutputText(event)">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3" style="padding-left: 0;">
+                            <label for="output-format">Output Format</label>
+                            <select id="output-format"
+                                    class="form-control"
+                                    onchange="updateOutputText(event);">
+                                <option value='0'>Default (&#rrggbb)</option>
+                                <option value='2'>Legacy (&x&r&r&g&g&b&b)</option>
+                                <option value='6'>Console (§x§r§r§g§g§b§b)</option>
+                                <option value='8'>MOTD (\u00A7x)</option>
+                                <option value='1'>Chat (<#rrggbb>)</option>
+                                <option value='7'>BBCode [COLOR=#rrggbb]</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3" style="padding-left: 0;">
+                            <label for="color-preset">Color Preset</label>
+                            <select id="color-preset"
+                                    class="form-control"
+                                    onchange="preset(this.value); updateOutputText(event); ">
+                                <option value='0'>None</option>
+                                <option value='1'>Rainbow</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="numOfColors">Number of Colors</label>
+                        <input class="form-control"
+                               style="width: 75px;"
+                               value="2" id="numOfColors" type="number" min="2" max="10"
+                               onchange="updateOutputText(event); toggleColors(this.value);"
+                               oninput="updateOutputText(event); toggleColors(this.value);"/>
+                    </div>
+                    <div class="row">
+                        <div id="dbold">
+                            <input type="checkbox" id="bold" onclick="updateOutputText(event);"/>
+                            <label for="bold">Bold</label>
+                        </div>
+                        <div id="ditalics">
+                            <input type="checkbox" id="italics" onclick="updateOutputText(event);"/>
+                            <label for="italics">Italic</label>
+                        </div>
+                        <div id="dunderline">
+                            <input type="checkbox" id="underline" onclick="updateOutputText(event);"/>
+                            <label for="underline">Underline</label>
+                        </div>
+                        <div id="dstrike">
+                            <input type="checkbox" id="strike" onclick="updateOutputText(event);"/>
+                            <label for="strike">Strikethrough</label>
+                        </div>
+                        <div id="appearance" style="display: none">
+                            <input type="checkbox" id="darkmode" onclick="darkMode();"></input>
+                            <label for="darkmode" style="margin-bottom: 0px;margin-top: 0px;"> Dark Mode</label>
+                        </div>
+                    </div>
 
-    inputText.addEventListener("input", function() {
-      const input = inputText.value;
-      const converted = convertToFont(input);
-      convertedText.value = converted;
-    });
+                    <br/>
 
-    convertedText.addEventListener("click", function() {
-      convertedText.select();
-      document.execCommand("copy");
-      copyMessage.innerText = "Copied to clipboard";
-      copyMessage.style.visibility='visible'
-      setTimeout(function() {
-        copyMessage.innerText = "";
-        copyMessage.style.visibility='hidden'
-      }, 5000);
-    });
+                    <div class="row">
+                        <div id="output-convert">
+                            <label id="label5" for="outputText">Font Converter</label>
+                            <label id="graylabel3" class="gray" for="outputText" style="font-weight: normal;">Type in
+                                the text you want to convert to the fancy Minecraft font.</label>
+                            <div class="yes-no" style="width: 100%">
+                                <label style="width: 100%">Put the converted text in to the RGB input instantly?</label>
+                                <input type="radio" id="yes" name="fav_language" value="Yes" checked>
+                                <label for="yes">Yes</label><br>
+                                <input type="radio" id="no" name="fav_language" value="No">
+                                <label for="no">No</label><br>
+                            </div>
 
-    function convertToFont(text) {
-      const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-      const font = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-      let convertedText = "";
-
-      for (let i = 0; i < text.length; i++) {
-        const index = alphabet.indexOf(text[i]);
-        if (index !== -1) {
-          convertedText += font[index];
-        } else {
-          convertedText += text[i];
-        }
-      }
-
-      return convertedText;
-    }
-  </script>
+                            <div class="col" style="margin-top: 2%">
+                                <div class="form-group">
+                                    <label for="input-text" class="text-white">Input Text:</label>
+                                    <textarea id="input-text" class="form-control darky"
+                                              placeholder="Enter your text here"></textarea>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="converted-text" class="text-white">Converted Text:</label>
+                                    <textarea id="converted-text" style="font-family: Arial" class="form-control darky"
+                                              readonly></textarea>
+                                    <h4 class="text-white" style="visibility: hidden" id="copy-message"></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="jscolor.js"></script>
+<script src="script.js"></script>
+<script src="convert.js"></script>
 </body>
+
+<footer>
+    <p>Based on Birdflop RRB Editor by <a href="https://github.com/Oli-idk">Oli</a> and <a
+            href="https://github.com/saboooor">Saboor</a></p>
+</footer>
 </html>
